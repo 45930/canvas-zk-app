@@ -1,3 +1,3 @@
-import { Add } from './Add.js';
+import { Canvas } from './Canvas.js';
 
-export { Add };
+export { Canvas };
