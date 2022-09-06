@@ -6,11 +6,12 @@
   //   canvasStore,
   // } from "./lib/stores/localMinaStore";
 
+  import { canvasStore, initCanvasStore } from "./lib/stores/canvasDataStore";
+
   import {
     loadSnarky,
     berkeleyMinaStore as minaStore,
     deployedZkAppsStore,
-    canvasStore,
   } from "./lib/stores/berkeleyMinaStore";
 
   import { onMount } from "svelte";
@@ -19,6 +20,7 @@
   import { fetchAccount } from "snarkyjs";
 
   onMount(async () => {
+    initCanvasStore();
     const isSnarkyLoaded = $minaStore;
     if (!isSnarkyLoaded) {
       await loadSnarky();

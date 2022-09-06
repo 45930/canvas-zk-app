@@ -27,9 +27,6 @@ let server = http.createServer(async (req, res) => {
     js: 'application/javascript',
     css: 'text/css'
   }[extension] || 'text';
-  console.log(path.basename(file))
-  console.log(extension)
-  console.log({ ...defaultHeaders, 'content-type': contentType })
   let headers = { ...defaultHeaders, 'content-type': contentType };
 
   res.writeHead(200, headers);
