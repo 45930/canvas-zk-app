@@ -18,14 +18,17 @@
   import { onMount } from "svelte";
   import CanvasElement from "./lib/components/CanvasElement.svelte";
   import { CanvasData } from "./lib/snarky/helpers/CanvasData";
+  import { isReady } from "snarkyjs";
 
   onMount(async () => {
     initCanvasStore();
     const isSnarkyLoaded = $minaStore;
-    if (!isSnarkyLoaded) {
+    if (isSnarkyLoaded) {
+      assertValidity();
+    } else {
       await loadSnarky();
+      assertValidity();
     }
-    assertValidity();
   });
 
   const blankCanvas = CanvasData.blank();
@@ -33,6 +36,8 @@
   let dataValidity = "Unknown";
 
   const assertValidity = async function () {
+    await isReady;
+
     dataValidity = "Unknown";
     try {
       await $deployedZkAppsStore.assertValidCanvas($canvasStore);
