@@ -1,48 +1,41 @@
-# Svelte + TS + Vite
+# Canvas ZK App
 
-This template should help get you started developing with Svelte and TypeScript in Vite.
+This canvas is a ZK App built with snarkyJS designed to test interactivity with the Berkeley QA Net.  
 
-## Recommended IDE Setup
+Deployed at [canvas-zk-app.vercel.app](https://canvas-zk-app.vercel.app/)
 
-[VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode).
+Backend repo at [github.com/qcomps/canvas-data-api](https://github.com/qcomps/canvas-data-api)
 
-## Need an official Svelte framework?
+## Development
 
-Check out [SvelteKit](https://github.com/sveltejs/kit#readme), which is also powered by Vite. Deploy anywhere with its serverless-first approach and adapt to various platforms, with out of the box support for TypeScript, SCSS, and Less, and easily-added support for mdsvex, GraphQL, PostCSS, Tailwind CSS, and more.
+This frontend is run on Vite with the Svelte framework (not SvelteKit).  To run a server locally, run `npm run dev`, and it's deployed to vercel as configured in `vercel.json`.
 
-## Technical considerations
+Note that this repo is a WIP - it expects a backend server to be running, and ultimately to be connected to a redis instance.  I haven't stubbed out these calls anywhere so it's not quite ready for other devs to start running locally.
 
-**Why use this over SvelteKit?**
+Required values in the `.env`:
+- `VITE_MINA_PRIVATE_KEY` | base 58 private key of the deployed canvas contract
+- `VITE_SERVER_URL` | url for backend server
 
-- It brings its own routing solution which might not be preferable for some users.
-- It is first and foremost a framework that just happens to use Vite under the hood, not a Vite app.
-  `vite dev` and `vite build` wouldn't work in a SvelteKit environment, for example.
+TODO:
+- Configure options for local mina vs qa net mina
+- Configure dummy backend so the app can work in dev environment
+- ...
 
-This template contains as little as possible to get started with Vite + TypeScript + Svelte, while taking into account the developer experience with regards to HMR and intellisense. It demonstrates capabilities on par with the other `create-vite` templates and is a good starting point for beginners dipping their toes into a Vite + Svelte project.
+## What does the App do?
 
-Should you later need the extended capabilities and extensibility provided by SvelteKit, the template has been structured similarly to SvelteKit so that it is easy to migrate.
+[canvas.jpg]
 
-**Why `global.d.ts` instead of `compilerOptions.types` inside `jsconfig.json` or `tsconfig.json`?**
+The canvas is a shared mina contract state represented visually.  It is a 32x32 matrix of boolean values representing whether a pixel should be colored or not.  The matrix is hashed and committed to the blockchain on request which allows everyone to confirm that the canvas they load when they access the webpage is the same canvas that has been committed to the Mina chain.
 
-Setting `compilerOptions.types` shuts out all other types not explicitly listed in the configuration. Using triple-slash references keeps the default TypeScript setting of accepting type information from the entire workspace, while also adding `svelte` and `vite/client` type information.
+For now, there are no permissions or proofs required to update the state.  You could update the state of the contract without knowing the state right now, which means that you don't even need the website.  In the future, I'd like to add additional features to the app which require different proofs/signatures, and makes it so that knowing the state of the canvas is actually important for updating its state.
 
-**Why include `.vscode/extensions.json`?**
+Even without any "useful" features, the canvas stands as an example of how to read and write data to the mina blockchain from a web app, and of how to deploy such an app so that it is accessible to the world.
 
-Other templates indirectly recommend extensions via the README, but this file allows VS Code to prompt the user to install the recommended extension upon opening the project.
+## TODO / Ideas to build off of
 
-**Why enable `allowJs` in the TS template?**
-
-While `allowJs: false` would indeed prevent the use of `.js` files in the project, it does not prevent the use of JavaScript syntax in `.svelte` files. In addition, it would force `checkJs: false`, bringing the worst of both worlds: not being able to guarantee the entire codebase is TypeScript, and also having worse typechecking for the existing JavaScript. In addition, there are valid use cases in which a mixed codebase may be relevant.
-
-**Why is HMR not preserving my local component state?**
-
-HMR state preservation comes with a number of gotchas! It has been disabled by default in both `svelte-hmr` and `@sveltejs/vite-plugin-svelte` due to its often surprising behavior. You can read the details [here](https://github.com/rixo/svelte-hmr#svelte-hmr).
-
-If you have state that's important to retain within a component, consider creating an external store which would not be replaced by HMR.
-
-```ts
-// store.ts
-// An extremely simple external store
-import { writable } from 'svelte/store'
-export default writable(0)
-```
+- Buy and sell permissions to edit tiles
+- More color options / more complex model of a tile than just on/off
+- User-paid transaction fees
+- Public vision of squares, private ownership records
+- Gamification, make the canvas operate like a Go board, or make it like a map with borders that can shift under certain criteria
+- ...
