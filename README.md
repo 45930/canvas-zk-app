@@ -23,7 +23,7 @@ TODO:
 
 ## What does the App do?
 
-[canvas.jpg]
+![canvas.jpg](https://raw.githubusercontent.com/qcomps/canvas-zk-app/f90be1389ab76f2adae2e64c7817ac587d118ff0/docs/canvas.jpg)
 
 The canvas is a shared mina contract state represented visually.  It is a 32x32 matrix of boolean values representing whether a pixel should be colored or not.  The matrix is hashed and committed to the blockchain on request which allows everyone to confirm that the canvas they load when they access the webpage is the same canvas that has been committed to the Mina chain.
 
