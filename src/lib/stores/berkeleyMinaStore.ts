@@ -4,7 +4,7 @@ import { writable } from 'svelte/store';
 import { Canvas } from '../snarky/Canvas';
 import { CanvasData } from '../snarky/helpers/CanvasData';
 
-const BERKELEY_ZKAPP_ADDRESS = 'B62qptauSR6gcyu4Wi1XJ87jfksTGtMThs1tLBDZiKNFqes3LG1WnKt';
+const BERKELEY_ZKAPP_ADDRESS = 'B62qmu88hV2r7N15qAn2kjAb9Q1oS7RzhyPRuiEZTJ4CryjDQBN7mvD';
 
 export const loadSnarky = async function () {
   await isReady;
