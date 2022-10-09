@@ -22,7 +22,7 @@ let tx = await Mina.transaction(account, () => {
 
   zkAppInstance.init(canvasData);
 });
-await tx.send().wait();
+await tx.send();
 
 console.log('Deployed!');
 
@@ -35,7 +35,7 @@ canvasData.switchCellValue(11, 10);
 tx = await Mina.transaction(account, () => {
   zkAppInstance.update(canvasData);
 });
-await tx.send().wait();
+await tx.send();
 
 console.log('Updated!');
 

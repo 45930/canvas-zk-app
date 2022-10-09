@@ -39,7 +39,7 @@ describe('Canvas', () => {
         zkAppInstance.deploy({ zkappKey: zkAppPrivateKey });
         zkAppInstance.init(CanvasData.blank());
       });
-      await tx.send().wait();
+      await tx.send();
     });
 
     it('deploys', async () => {

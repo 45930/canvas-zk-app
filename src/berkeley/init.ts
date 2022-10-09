@@ -53,7 +53,7 @@ if (!isDeployed) {
 
   // send the transaction to the graphql endpoint
   console.log('Sending the transaction...');
-  await transaction.send().wait();
+  await transaction.send();
   console.log('Deployed!');
 }
 

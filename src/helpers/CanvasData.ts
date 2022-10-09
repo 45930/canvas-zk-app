@@ -1,11 +1,18 @@
-import { Bool, CircuitValue, Poseidon, PublicKey } from 'snarkyjs';
+import { Bool, CircuitValue, matrixProp, Poseidon, PublicKey } from 'snarkyjs';
 
-type Cell = {
-  value: boolean;
+class Cell extends CircuitValue {
   owner: PublicKey;
-};
+  value: Bool;
+
+  constructor(owner: PublicKey, value: Bool) {
+    super();
+    this.value = value;
+    this.owner = owner;
+  }
+}
 
 export class CanvasData extends CircuitValue {
+  @matrixProp(Cell, 32, 32)
   value: Cell[][];
 
   constructor(value: Cell[][]) {
@@ -15,19 +22,13 @@ export class CanvasData extends CircuitValue {
 
   switchCellValue(i: number, j: number) {
     const oldCell = this.value[i][j];
-    const newCell = {
-      owner: oldCell.owner,
-      value: !oldCell.value,
-    };
+    const newCell = new Cell(oldCell.owner, new Bool(!oldCell.value));
     this.update(i, j, newCell);
   }
 
   updateCellOwner(i: number, j: number, owner: PublicKey) {
     const oldCell = this.value[i][j];
-    const newCell = {
-      owner: owner,
-      value: oldCell.value,
-    };
+    const newCell = new Cell(owner, new Bool(oldCell.value));
     this.update(i, j, newCell);
   }
 
@@ -49,10 +50,7 @@ export class CanvasData extends CircuitValue {
     return new CanvasData(
       [...Array(32).keys()].map(() => {
         return [...Array(32).keys()].map(() => {
-          return {
-            value: false,
-            owner: PublicKey.empty(),
-          };
+          return new Cell(PublicKey.empty(), new Bool(false));
         });
       })
     );

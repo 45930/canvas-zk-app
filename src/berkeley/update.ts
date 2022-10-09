@@ -27,7 +27,7 @@ canvasData.switchCellValue(11, 10);
 let tx = await Mina.transaction(account, () => {
   zkAppInstance.update(canvasData);
 });
-await tx.send().wait();
+await tx.send();
 
 console.log('Updated!');
 
