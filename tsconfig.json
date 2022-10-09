@@ -21,6 +21,6 @@
     "isolatedModules": true,
     "resolveJsonModule": true
   },
-  "include": ["./src"],
+  "include": ["./src", "tests/Canvas.test.ts", "tests/Canvas.test.ts"],
   "exclude": ["./src/**/*.test.ts"]
 }

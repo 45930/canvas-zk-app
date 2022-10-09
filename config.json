@@ -1,4 +1,11 @@
 {
   "version": 1,
-  "networks": {}
+  "networks": {
+    "canvas": {
+      "url": "https://proxy.berkeley.minaexplorer.com/graphql",
+      "keyPath": "keys/canvas.json",
+      "fee": "0.1",
+      "smartContract": "Canvas"
+    }
+  }
 }
