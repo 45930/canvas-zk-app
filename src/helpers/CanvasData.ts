@@ -1,8 +1,16 @@
-import { Bool, CircuitValue, matrixProp, Poseidon, PublicKey } from 'snarkyjs';
+import {
+  Bool,
+  Circuit,
+  CircuitValue,
+  matrixProp,
+  Poseidon,
+  prop,
+  PublicKey,
+} from 'snarkyjs';
 
 class Cell extends CircuitValue {
-  owner: PublicKey;
-  value: Bool;
+  @prop owner: PublicKey;
+  @prop value: Bool;
 
   constructor(owner: PublicKey, value: Bool) {
     super();
@@ -12,8 +20,7 @@ class Cell extends CircuitValue {
 }
 
 export class CanvasData extends CircuitValue {
-  @matrixProp(Cell, 32, 32)
-  value: Cell[][];
+  @matrixProp(Cell, 32, 32) value: Cell[][];
 
   constructor(value: Cell[][]) {
     super();
@@ -22,7 +29,10 @@ export class CanvasData extends CircuitValue {
 
   switchCellValue(i: number, j: number) {
     const oldCell = this.value[i][j];
-    const newCell = new Cell(oldCell.owner, new Bool(!oldCell.value));
+    const newCell = new Cell(
+      oldCell.owner,
+      new Bool(Circuit.if(oldCell.value, new Bool(false), new Bool(true)))
+    );
     this.update(i, j, newCell);
   }
 

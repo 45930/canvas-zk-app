@@ -31,19 +31,28 @@ describe('Canvas', () => {
     setTimeout(shutdown, 0);
   });
 
-  describe('Base Case', () => {
+  describe('Deploy', () => {
     beforeEach(async () => {
       // Deploy a fresh canvas
       let tx = await Mina.transaction(account, () => {
         AccountUpdate.fundNewAccount(account);
         zkAppInstance.deploy({ zkappKey: zkAppPrivateKey });
-        zkAppInstance.init(CanvasData.blank());
+        // zkAppInstance.init(CanvasData.blank());
       });
       await tx.send();
     });
 
-    it('deploys', async () => {
-      // await zkAppInstance.assertValidCanvas(CanvasData.blank())
+    it('validates that a blank canvas is deployed', async () => {
+      const canvasData = CanvasData.blank();
+      await zkAppInstance.assertValidCanvas(canvasData);
+    });
+
+    it('rejects that a non-blank canvas is deployed', async () => {
+      const canvasData = CanvasData.blank();
+      canvasData.switchCellValue(0, 0);
+      await expect(() => {
+        zkAppInstance.assertValidCanvas(canvasData);
+      }).toThrow();
     });
   });
 });

@@ -23,6 +23,7 @@ export class Canvas extends SmartContract {
       ...Permissions.default(),
       editState: Permissions.none(),
     });
+    this.canvasHash.set(CanvasData.blank().hash());
   }
 
   @method
