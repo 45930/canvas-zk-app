@@ -9,26 +9,24 @@ import {
   Circuit,
   PublicKey,
   PrivateKey,
+  Bool,
 } from 'snarkyjs';
 
-import { CanvasData } from './helpers/CanvasData';
-import { ClaimList16 } from './helpers/ClaimList';
+import { CanvasDataFactory } from './helpers/CanvasData.js';
+import { ClaimList1 } from './helpers/ClaimList.js';
+
+class CanvasData extends CanvasDataFactory(3) {}
 
 export class Canvas extends SmartContract {
   @state(Field) canvasHash = State<Field>();
 
   deploy(args: DeployArgs) {
     super.deploy(args);
+    this.canvasHash.set(CanvasData.blank().hash());
     this.setPermissions({
       ...Permissions.default(),
-      editState: Permissions.none(),
+      editState: Permissions.proof(),
     });
-    this.canvasHash.set(CanvasData.blank().hash());
-  }
-
-  @method
-  init(canvasData: CanvasData) {
-    this.canvasHash.set(canvasData.hash());
   }
 
   @method
@@ -40,16 +38,26 @@ export class Canvas extends SmartContract {
   }
 
   @method
-  claimCells(canvasData: CanvasData, claimList: ClaimList16, pkey: PrivateKey) {
+  claimCells(canvasData: CanvasData, claimList: ClaimList1, pkey: PrivateKey) {
     this.assertValidCanvas(canvasData);
+    const mutatedCanvas = canvasData.copy();
+    const pubKey = PublicKey.fromPrivateKey(pkey);
     // assert user has fewer than x claims already #TODO
-    claimList.claims.forEach((claim) => {
-      Circuit.if(
-        claim[0].lt(Field(999)),
-        this.claimCell(canvasData, claim[0], claim[1], pkey),
-        this.no_op()
-      );
-    });
+    for (let i = 0; i < CanvasData.size; i++) {
+      for (let j = 0; j < CanvasData.size; j++) {
+        console.log(i, j);
+        claimList.claims.forEach((claim) => {
+          const cell = mutatedCanvas.value[i][j];
+          const newOwner = Circuit.if(
+            Bool.and(Field(i).equals(claim[0]), Field(j).equals(claim[1])),
+            pubKey,
+            cell.owner
+          );
+          mutatedCanvas.updateCellOwner(i, j, newOwner);
+        });
+      }
+    }
+    this.canvasHash.set(mutatedCanvas.hash());
   }
 
   // For now we don't care what the old state was.  Everyone can update every pixel with no permissions as far as we care
@@ -57,17 +65,4 @@ export class Canvas extends SmartContract {
   update(canvasData: CanvasData) {
     this.canvasHash.set(canvasData.hash());
   }
-
-  @method
-  claimCell(canvasData: CanvasData, i: Field, j: Field, pkey: PrivateKey) {
-    const newOwner = PublicKey.fromPrivateKey(pkey);
-    canvasData.updateCellOwner(
-      Number(i.toString()),
-      Number(j.toString()),
-      newOwner
-    );
-  }
-
-  @method
-  no_op() {}
 }

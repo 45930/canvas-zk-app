@@ -1,12 +1,14 @@
 import { Canvas } from '../Canvas.js';
 
-import { CanvasData } from '../helpers/CanvasData.js';
+import { CanvasDataFactory } from '../helpers/CanvasData.js';
 
 import { privateKey } from './env.js';
 
 import { Mina, isReady, PrivateKey, shutdown } from 'snarkyjs';
 
 await isReady;
+
+class CanvasData extends CanvasDataFactory(3) {}
 
 let Berkeley = Mina.BerkeleyQANet(
   'https://proxy.berkeley.minaexplorer.com/graphql'

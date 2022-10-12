@@ -1,5 +1,5 @@
 import { Canvas } from '../src/Canvas';
-import { CanvasData } from '../src/helpers/CanvasData';
+import { CanvasDataFactory } from '../src/helpers/CanvasData';
 import {
   isReady,
   shutdown,
@@ -8,6 +8,9 @@ import {
   PublicKey,
   AccountUpdate,
 } from 'snarkyjs';
+import { ClaimList1 } from '../src/helpers/ClaimList';
+
+class CanvasData extends CanvasDataFactory(3) {}
 
 describe('Canvas', () => {
   let zkAppInstance: Canvas,
@@ -31,20 +34,21 @@ describe('Canvas', () => {
     setTimeout(shutdown, 0);
   });
 
-  describe('Deploy', () => {
+  describe('assertValidCanvas', () => {
     beforeEach(async () => {
       // Deploy a fresh canvas
       let tx = await Mina.transaction(account, () => {
         AccountUpdate.fundNewAccount(account);
         zkAppInstance.deploy({ zkappKey: zkAppPrivateKey });
-        // zkAppInstance.init(CanvasData.blank());
       });
       await tx.send();
     });
 
     it('validates that a blank canvas is deployed', async () => {
       const canvasData = CanvasData.blank();
-      await zkAppInstance.assertValidCanvas(canvasData);
+      await expect(() => {
+        zkAppInstance.assertValidCanvas(canvasData);
+      }).not.toThrow();
     });
 
     it('rejects that a non-blank canvas is deployed', async () => {
@@ -53,6 +57,39 @@ describe('Canvas', () => {
       await expect(() => {
         zkAppInstance.assertValidCanvas(canvasData);
       }).toThrow();
+    });
+  });
+
+  describe('claimCells', () => {
+    beforeEach(async () => {
+      // Deploy a fresh canvas
+      let tx = await Mina.transaction(account, () => {
+        AccountUpdate.fundNewAccount(account);
+        zkAppInstance.deploy({ zkappKey: zkAppPrivateKey });
+      });
+      await tx.send();
+    });
+
+    it('claims a cell', async () => {
+      const canvasData = CanvasData.blank();
+      const cells = Array<{ i: 2; j: 1 }>(1);
+      const claims = new ClaimList1(cells);
+      const pkey = PrivateKey.random();
+      const pubkey = PublicKey.fromPrivateKey(pkey);
+      let tx = await Mina.transaction(account, () => {
+        zkAppInstance.claimCells(canvasData, claims, pkey);
+      });
+      console.log('compiling...');
+      await Canvas.compile();
+      console.log('proving...');
+      await tx.prove();
+      await tx.send();
+
+      canvasData.updateCellOwner(2, 1, pubkey); // mutate the oringinal data
+      await expect(() => {
+        // assert that our mutated data has been stored as state
+        zkAppInstance.assertValidCanvas(canvasData);
+      }).not.toThrow();
     });
   });
 });

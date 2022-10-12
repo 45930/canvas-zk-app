@@ -1,12 +1,14 @@
 import { Canvas } from '../Canvas.js';
 
-import { CanvasData } from '../helpers/CanvasData.js';
+import { CanvasDataFactory } from '../helpers/CanvasData.js';
 
 import { privateKey, feePayerPrivateKey } from './env.js';
 
 import { Mina, isReady, PrivateKey, shutdown, fetchAccount } from 'snarkyjs';
 
 await isReady;
+
+class CanvasData extends CanvasDataFactory(3) {}
 
 let Berkeley = Mina.BerkeleyQANet(
   'https://proxy.berkeley.minaexplorer.com/graphql'
@@ -20,7 +22,7 @@ const zkAppAddress = zkAppPrivateKey.toPublicKey();
 const canvasData = CanvasData.blank();
 
 // console.log('Compiling smart contract...');
-// let { verificationKey } = await Canvas.compile(zkAppAddress);
+let { verificationKey } = await Canvas.compile();
 
 const zkAppInstance = new Canvas(zkAppAddress);
 let canvasHash = await zkAppInstance.canvasHash.fetch();
@@ -44,8 +46,7 @@ if (!isDeployed) {
     { feePayerKey, fee: transactionFee },
     () => {
       // AccountUpdate.fundNewAccount(feePayerKey);
-      // zkAppInstance.deploy({ verificationKey });
-      zkAppInstance.init(canvasData);
+      zkAppInstance.deploy({ verificationKey });
     }
   );
   // if you want to inspect the transaction, you can print it out:

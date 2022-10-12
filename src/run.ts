@@ -1,10 +1,13 @@
 import { Canvas } from './Canvas.js';
 
-import { CanvasData } from './helpers/CanvasData.js';
+import { CanvasDataFactory } from './helpers/CanvasData.js';
 
 import { Mina, isReady, PrivateKey, shutdown, AccountUpdate } from 'snarkyjs';
+import { ClaimList1 } from './helpers/ClaimList.js';
 
 await isReady;
+
+class CanvasData extends CanvasDataFactory(3) {}
 
 let Local = Mina.LocalBlockchain();
 Mina.setActiveInstance(Local);
@@ -19,8 +22,6 @@ let tx = await Mina.transaction(account, () => {
   AccountUpdate.fundNewAccount(account);
 
   zkAppInstance.deploy({ zkappKey: zkAppPrivateKey });
-
-  zkAppInstance.init(canvasData);
 });
 await tx.send();
 
@@ -28,14 +29,16 @@ console.log('Deployed!');
 
 zkAppInstance.assertValidCanvas(canvasData);
 
-canvasData.switchCellValue(10, 10);
-canvasData.switchCellValue(10, 11);
-canvasData.switchCellValue(11, 10);
-
-tx = await Mina.transaction(account, () => {
-  zkAppInstance.update(canvasData);
+const cells = Array<{ i: 2; j: 1 }>(1);
+const claims = new ClaimList1(cells);
+const pkey = PrivateKey.random();
+// const pubkey = PublicKey.fromPrivateKey(pkey);
+let tx2 = await Mina.transaction(account, () => {
+  zkAppInstance.claimCells(canvasData, claims, pkey);
 });
-await tx.send();
+await Canvas.compile();
+await tx2.prove();
+await tx2.send();
 
 console.log('Updated!');
 

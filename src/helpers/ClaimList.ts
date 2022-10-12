@@ -5,7 +5,7 @@ export type Claim = {
   j: number;
 } | null;
 
-type ClaimList16Type = Claim[];
+type ClaimListType = Claim[];
 
 /*
   A ClaimList is a wrapper for a circuit array of claims.
@@ -14,7 +14,7 @@ type ClaimList16Type = Claim[];
 export class ClaimList16 extends CircuitValue {
   @matrixProp(Field, 16, 2) claims: Field[][];
 
-  constructor(claims: ClaimList16Type) {
+  constructor(claims: ClaimListType) {
     super();
     if (claims.length !== 16) {
       throw Error('ClaimsList16 must have exctly 16 elements');
@@ -23,7 +23,25 @@ export class ClaimList16 extends CircuitValue {
       if (claim) {
         return [Field(claim.i), Field(claim.j)];
       } else {
-        return [Field(999), Field(999)];
+        return [Field(31), Field(31)];
+      }
+    });
+  }
+}
+
+export class ClaimList1 extends CircuitValue {
+  @matrixProp(Field, 1, 2) claims: Field[][];
+
+  constructor(claims: ClaimListType) {
+    super();
+    if (claims.length !== 1) {
+      throw Error('ClaimsList1 must have exctly 1 elements');
+    }
+    this.claims = claims.map((claim) => {
+      if (claim) {
+        return [Field(claim.i), Field(claim.j)];
+      } else {
+        return [Field(0), Field(0)];
       }
     });
   }

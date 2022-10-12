@@ -19,8 +19,9 @@ class Cell extends CircuitValue {
   }
 }
 
-export class CanvasData extends CircuitValue {
-  @matrixProp(Cell, 32, 32) value: Cell[][];
+export class BaseCanvasData extends CircuitValue {
+  static size: number;
+  value: Cell[][];
 
   constructor(value: Cell[][]) {
     super();
@@ -56,13 +57,27 @@ export class CanvasData extends CircuitValue {
     return hash;
   }
 
+  copy() {
+    const copy = BaseCanvasData.blank();
+    copy.value = this.value;
+    return copy;
+  }
+
   static blank() {
-    return new CanvasData(
-      [...Array(32).keys()].map(() => {
-        return [...Array(32).keys()].map(() => {
+    return new BaseCanvasData(
+      [...Array(this.size).keys()].map(() => {
+        return [...Array(this.size).keys()].map(() => {
           return new Cell(PublicKey.empty(), new Bool(false));
         });
       })
     );
   }
+}
+
+export function CanvasDataFactory(size: number): typeof BaseCanvasData {
+  class CanvasData_ extends BaseCanvasData {
+    static size = size;
+  }
+  matrixProp(Cell, size, size)(CanvasData_.prototype, 'value');
+  return CanvasData_;
 }
