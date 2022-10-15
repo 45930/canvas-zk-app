@@ -1,5 +1,6 @@
-import { Canvas } from '../src/Canvas';
-import { CanvasDataFactory } from '../src/helpers/CanvasData';
+import { Canvas } from '../src/Canvas.js';
+import { CanvasDataFactory } from '../src/helpers/CanvasData.js';
+import { ClaimListFactory } from '../src/helpers/ClaimList.js';
 import {
   isReady,
   shutdown,
@@ -8,9 +9,12 @@ import {
   PublicKey,
   AccountUpdate,
 } from 'snarkyjs';
-import { ClaimList1 } from '../src/helpers/ClaimList';
 
 class CanvasData extends CanvasDataFactory(3) {}
+class ClaimList1 extends ClaimListFactory(1) {}
+// class ClaimList3 extends ClaimListFactory(3) { }
+
+let canvasCompiled = false;
 
 describe('Canvas', () => {
   let zkAppInstance: Canvas,
@@ -20,6 +24,11 @@ describe('Canvas', () => {
 
   beforeEach(async () => {
     await isReady;
+
+    if (!canvasCompiled) {
+      await Canvas.compile();
+      canvasCompiled = true;
+    }
 
     let Local = Mina.LocalBlockchain();
     Mina.setActiveInstance(Local);
@@ -40,7 +49,9 @@ describe('Canvas', () => {
       let tx = await Mina.transaction(account, () => {
         AccountUpdate.fundNewAccount(account);
         zkAppInstance.deploy({ zkappKey: zkAppPrivateKey });
+        zkAppInstance.init();
       });
+      await tx.prove();
       await tx.send();
     });
 
@@ -66,22 +77,21 @@ describe('Canvas', () => {
       let tx = await Mina.transaction(account, () => {
         AccountUpdate.fundNewAccount(account);
         zkAppInstance.deploy({ zkappKey: zkAppPrivateKey });
+        zkAppInstance.init();
       });
+      await tx.prove();
       await tx.send();
     });
 
     it('claims a cell', async () => {
       const canvasData = CanvasData.blank();
-      const cells = Array<{ i: 2; j: 1 }>(1);
+      const cells = [{ i: 2, j: 1 }];
       const claims = new ClaimList1(cells);
       const pkey = PrivateKey.random();
       const pubkey = PublicKey.fromPrivateKey(pkey);
       let tx = await Mina.transaction(account, () => {
         zkAppInstance.claimCells(canvasData, claims, pkey);
       });
-      console.log('compiling...');
-      await Canvas.compile();
-      console.log('proving...');
       await tx.prove();
       await tx.send();
 

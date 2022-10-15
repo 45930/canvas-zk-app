@@ -59,7 +59,11 @@ export class BaseCanvasData extends CircuitValue {
 
   copy() {
     const copy = BaseCanvasData.blank();
-    copy.value = this.value;
+    copy.value = this.value.map((row) => {
+      return row.map((cell) => {
+        return new Cell(cell.owner, cell.value);
+      });
+    });
     return copy;
   }
 
@@ -67,7 +71,12 @@ export class BaseCanvasData extends CircuitValue {
     return new BaseCanvasData(
       [...Array(this.size).keys()].map(() => {
         return [...Array(this.size).keys()].map(() => {
-          return new Cell(PublicKey.empty(), new Bool(false));
+          return new Cell(
+            PublicKey.fromBase58(
+              'B62qptauSR6gcyu4Wi1XJ87jfksTGtMThs1tLBDZiKNFqes3LG1WnKt'
+            ),
+            new Bool(false)
+          );
         });
       })
     );

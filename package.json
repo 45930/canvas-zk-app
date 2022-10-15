@@ -18,7 +18,7 @@
     "coverage": "node --experimental-vm-modules --experimental-wasm-modules --experimental-wasm-threads node_modules/.bin/jest --coverage",
     "format": "prettier --write --ignore-unknown **/*",
     "prepare": "husky install",
-    "test": "node --experimental-vm-modules --experimental-wasm-modules --experimental-wasm-threads node_modules/.bin/jest tests/*",
+    "test": "npm run build && node --stack-trace-limit=1000 --experimental-vm-modules --experimental-wasm-modules --experimental-wasm-threads node_modules/.bin/jest build/tests/*",
     "lint": "npx eslint src/* --fix"
   },
   "lint-staged": {

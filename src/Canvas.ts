@@ -13,16 +13,16 @@ import {
 } from 'snarkyjs';
 
 import { CanvasDataFactory } from './helpers/CanvasData.js';
-import { ClaimList1 } from './helpers/ClaimList.js';
+import { ClaimListFactory } from './helpers/ClaimList.js';
 
 class CanvasData extends CanvasDataFactory(3) {}
+class ClaimList1 extends ClaimListFactory(1) {}
 
 export class Canvas extends SmartContract {
   @state(Field) canvasHash = State<Field>();
 
   deploy(args: DeployArgs) {
     super.deploy(args);
-    this.canvasHash.set(CanvasData.blank().hash());
     this.setPermissions({
       ...Permissions.default(),
       editState: Permissions.proof(),
@@ -30,6 +30,10 @@ export class Canvas extends SmartContract {
   }
 
   @method
+  init() {
+    this.canvasHash.set(CanvasData.blank().hash());
+  }
+
   assertValidCanvas(canvasData: CanvasData) {
     const assertedHash = canvasData.hash();
     const actualHash = this.canvasHash.get();
@@ -45,7 +49,6 @@ export class Canvas extends SmartContract {
     // assert user has fewer than x claims already #TODO
     for (let i = 0; i < CanvasData.size; i++) {
       for (let j = 0; j < CanvasData.size; j++) {
-        console.log(i, j);
         claimList.claims.forEach((claim) => {
           const cell = mutatedCanvas.value[i][j];
           const newOwner = Circuit.if(
@@ -58,11 +61,5 @@ export class Canvas extends SmartContract {
       }
     }
     this.canvasHash.set(mutatedCanvas.hash());
-  }
-
-  // For now we don't care what the old state was.  Everyone can update every pixel with no permissions as far as we care
-  @method
-  update(canvasData: CanvasData) {
-    this.canvasHash.set(canvasData.hash());
   }
 }
