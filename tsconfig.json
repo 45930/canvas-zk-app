@@ -1,8 +1,16 @@
 {
+  "extends": "@tsconfig/svelte/tsconfig.json",
   "compilerOptions": {
-    "target": "ES2019",
+    "baseUrl": ".",
+    "checkJs": true,
+    "isolatedModules": true,
+    "target": "es2020",
     "module": "es2022",
-    "lib": ["dom", "esnext"],
+    "lib": [
+      "dom",
+      "ES2020",
+      "esnext"
+    ],
     "outDir": "./build",
     "rootDir": ".",
     "strict": true,
@@ -18,9 +26,17 @@
     "sourceMap": false,
     "noFallthroughCasesInSwitch": true,
     "allowSyntheticDefaultImports": true,
-    "isolatedModules": true,
     "resolveJsonModule": true
   },
-  "include": ["./src", "tests/Canvas.test.ts", "tests/Canvas.test.ts"],
-  "exclude": ["./src/**/*.test.ts"]
+  "include": [
+    "src/**/*.d.ts",
+    "src/**/*.ts",
+    "src/**/*.js",
+    "src/**/*.svelte"
+  ],
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    }
+  ]
 }

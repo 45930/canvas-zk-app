@@ -1,16 +1,32 @@
-# NodeJS
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
 node_modules
-build
-coverage
+dist
+dist-ssr
+*.local
 
-# Editor
-.vscode
-
-# System
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
 .DS_Store
-
-# Never commit keys to Git!
-keys
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
 .env
-/src/**/**/env.ts
+
+/keys
+/build
+
+*/**/env.ts
+.husky/*
