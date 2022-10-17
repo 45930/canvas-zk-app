@@ -1,11 +1,14 @@
-import { isReady, Mina, Party, PrivateKey } from 'snarkyjs';
+import { isReady, Mina, AccountUpdate, PrivateKey } from 'snarkyjs';
 import { writable } from 'svelte/store';
 
-import { Canvas } from '../snarky/Canvas';
-import { CanvasData } from '../snarky/helpers/CanvasData';
+import { Canvas, CanvasDataFactory } from 'zk-canvas-contracts';
+
+class CanvasData extends CanvasDataFactory(3) { }
 
 export const loadSnarky = async function () {
   await isReady;
+
+  await Canvas.compile();
 
   let Local = Mina.LocalBlockchain();
   Mina.setActiveInstance(Local);
@@ -14,22 +17,16 @@ export const loadSnarky = async function () {
   const zkAppPrivateKey = PrivateKey.random();
   const zkAppAddress = zkAppPrivateKey.toPublicKey();
   const zkAppInstance = new Canvas(zkAppAddress);
-  const canvasData = CanvasData.blank();
-
-  canvasData.switch(0, 0)
-  canvasData.switch(1, 1)
-  canvasData.switch(2, 2)
-  canvasData.switch(3, 3)
-  canvasData.switch(4, 4)
+  const canvasData = CanvasData.blank()
 
   let tx = await Mina.transaction(account, () => {
-    Party.fundNewAccount(account);
+    AccountUpdate.fundNewAccount(account);
 
     zkAppInstance.deploy({ zkappKey: zkAppPrivateKey });
-
-    zkAppInstance.init(canvasData);
+    zkAppInstance.init();
   });
-  await tx.send().wait();
+  await tx.prove();
+  await tx.send();
 
   localMinaStore.set(true)
   deployedZkAppsStore.set(zkAppInstance)

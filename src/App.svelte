@@ -1,24 +1,26 @@
 <script lang="ts">
-  // import {
-  //   loadSnarky,
-  //   localMinaStore as minaStore,
-  //   deployedZkAppsStore,
-  //   canvasStore,
-  // } from "./lib/stores/localMinaStore";
+  import {
+    loadSnarky,
+    localMinaStore as minaStore,
+    deployedZkAppsStore,
+  } from "./lib/stores/localMinaStore";
 
   import { canvasStore, initCanvasStore } from "./lib/stores/canvasDataStore";
 
-  import {
-    loadSnarky,
-    berkeleyMinaStore as minaStore,
-    deployedZkAppsStore,
-    updateCanvasHash,
-  } from "./lib/stores/berkeleyMinaStore";
+  // import {
+  //   loadSnarky,
+  //   berkeleyMinaStore as minaStore,
+  //   deployedZkAppsStore,
+  //   updateCanvasHash,
+  // } from "./lib/stores/berkeleyMinaStore";
 
   import { onMount } from "svelte";
   import CanvasElement from "./lib/components/CanvasElement.svelte";
-  import { CanvasData } from "./lib/snarky/helpers/CanvasData";
   import { isReady } from "snarkyjs";
+
+  import { CanvasDataFactory } from "zk-canvas-contracts";
+
+  class CanvasData extends CanvasDataFactory(3) {}
 
   onMount(async () => {
     initCanvasStore();
@@ -31,6 +33,7 @@
     }
   });
 
+  // #TODO - .blank() requires isReady, need a new way to init the frontend
   const blankCanvas = CanvasData.blank();
 
   let dataValidity = "Unknown";

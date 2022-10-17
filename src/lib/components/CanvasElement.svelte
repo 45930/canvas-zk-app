@@ -1,6 +1,8 @@
 <script lang="ts">
-  import { CanvasData } from "../snarky/helpers/CanvasData";
   import { updateCanvasStore } from "../stores/canvasDataStore";
+  import { Canvas, CanvasDataFactory } from "zk-canvas-contracts";
+
+  class CanvasData extends CanvasDataFactory(3) {}
 
   export let canvas: CanvasData;
 

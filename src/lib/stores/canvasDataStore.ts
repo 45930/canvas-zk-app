@@ -1,6 +1,9 @@
 import { writable } from 'svelte/store';
-import { CanvasData } from '../snarky/helpers/CanvasData';
 import { isReady } from 'snarkyjs';
+
+import { CanvasDataFactory } from 'zk-canvas-contracts';
+
+class CanvasData extends CanvasDataFactory(3) { }
 
 export const initCanvasStore = async () => {
   const canvasDataRaw = await (await fetch(`${import.meta.env.VITE_SERVER_URL}/canvasData`)).json();
@@ -10,7 +13,7 @@ export const initCanvasStore = async () => {
 export const updateCanvasStore = async (i: number, j: number, canvasData: CanvasData) => {
   await isReady;
 
-  canvasData.switch(i, j);
+  canvasData.switchCellValue(i, j);
   const options = {
     method: 'POST',
     body: JSON.stringify(canvasData.value),
